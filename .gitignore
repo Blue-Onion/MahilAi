@@ -27,3 +27,5 @@ ENV/
 
 # YOLO specific
 runs/
+Mood.txt
+video.mp4
