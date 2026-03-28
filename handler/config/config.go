@@ -17,9 +17,9 @@ type Config struct {
 
 func CreateDefaultConfig() error {
 	defaultConfig := `cameras:
-	- name: cam1
-	  source: 0
-  `
+  - name: cam1
+    source: 0
+`
 
 	return os.WriteFile("config.yaml", []byte(defaultConfig), 0644)
 }

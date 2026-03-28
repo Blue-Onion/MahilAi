@@ -1,17 +1,19 @@
 package main
 
 import (
-	"fmt"
 	"log"
 
 	"github.com/Blue-Onion/MahilAi/handler/config"
+	"github.com/Blue-Onion/MahilAi/handler/config/Camera"
 )
 
-func main(){
-	camera,err:=config.LoadConfig()
-	if err!=nil{
+
+func main() {
+	cfg, err := config.LoadConfig()
+	if err != nil {
 		log.Fatal(err.Error())
 	}
-	fmt.Println(camera)
-	
+	log.Print("Config loaded. Starting camera work...")
+
+	camera.StartCameraWork(cfg)
 }

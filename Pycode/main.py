@@ -1,37 +1,56 @@
+import sys
+import json
+import time
 from ultralytics import YOLO
 import cv2
 
-def doSomething():
-    print("Human Detected")
+def run_detector(source, camera_name):
+    # Load YOLO model
+    model = YOLO("yolov8n.pt") 
+    
+    # Initialize video capture
+    # Convert source to int if it's a single digit (for webcam index)
+    if isinstance(source, str) and source.isdigit():
+        source = int(source)
+    
+    cap = cv2.VideoCapture(source)
+    if not cap.isOpened():
+        print(f"Error: Could not open video source {source}", file=sys.stderr)
+        return
 
-model = YOLO("yolov8n.pt") 
-cap = cv2.VideoCapture(0)
+    try:
+        while True:
+            ret, frame = cap.read()
+            if not ret:
+                break
 
-while True:
-    ret, frame = cap.read()
-    if not ret:
-        break
+            # Run detection
+            results = model(frame, verbose=False)
 
-    res = model(frame, verbose=False)
+            for r in results:
+                for box in r.boxes:
+                    cls = int(box.cls[0])
+                    conf = float(box.conf[0])
 
-    for r in res:
-        for box in r.boxes:
-            cls = int(box.cls[0])
+                    if cls == 0:  # person class
+                        event = {
+                            "Camera": camera_name,
+                            "Time": time.time(),
+                            "Event": "Human Detected",
+                            "Confidence": conf
+                        }
+                        # Print JSON to stdout for the Go handler to read
+                        print(json.dumps(event), flush=True)
 
-            if cls == 0:  # person class
-                doSomething()
+    finally:
+        cap.release()
 
-                x1, y1, x2, y2 = map(int, box.xyxy[0])
-                cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
+if __name__ == "__main__":
+    if len(sys.argv) < 3:
+        print("Usage: python main.py <source> <camera_name>", file=sys.stderr)
+        sys.exit(1)
 
-                cv2.putText(frame, "Human", (x1, y1 - 10),
-                            cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 0), 2)
-
-    cv2.imshow("Human Detection", frame)
-
-    # ESC key to exit
-    if cv2.waitKey(1) == 27:
-        break
-
-cap.release()
-cv2.destroyAllWindows()
+    source_arg = sys.argv[1]
+    name_arg = sys.argv[2]
+    
+    run_detector(source_arg, name_arg)
