@@ -3,8 +3,8 @@ package main
 import (
 	"log"
 
+	camera "github.com/Blue-Onion/MahilAi/handler/Camera"
 	"github.com/Blue-Onion/MahilAi/handler/config"
-	"github.com/Blue-Onion/MahilAi/handler/config/Camera"
 )
 
 
