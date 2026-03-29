@@ -56,3 +56,21 @@ func WriteEvent(event *config.Event) {
 
 	file.WriteString(string(data) + "\n")
 }
+func ReadEvent(date string,cam string){
+	if cam==""{
+		ceadCameraAllEvent(cam)
+	}else if date==""{
+		ceadDateAllEvent(date)
+	}else{
+		camDateEvent(date,cam)
+	}
+
+}
+func ceadCameraAllEvent(cam string){
+}
+func ceadDateAllEvent(date string){
+
+}
+func camDateEvent(date string,cam string){
+
+}
