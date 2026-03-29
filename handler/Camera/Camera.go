@@ -7,21 +7,17 @@ import (
 	"os/exec"
 	"sync"
 
+	record "github.com/Blue-Onion/MahilAi/handler/Record"
 	"github.com/Blue-Onion/MahilAi/handler/config"
 )
 
-type Event struct {
-	Camera     string
-	Time       float64
-	Event      string
-	Confidence float64
-}
 
-func StartCameraWork(cfg *config.Config){
 
-	var channels []<-chan Event
+func StartCameraWork(cfg *config.Config) {
 
-	for _,val:=range cfg.Cameras {
+	var channels []<-chan config.Event
+
+	for _, val := range cfg.Cameras {
 		ch, err := streamEvent(val)
 		if err != nil {
 			panic(err)
@@ -30,14 +26,13 @@ func StartCameraWork(cfg *config.Config){
 	}
 
 	merged := merge(channels...)
-
 	for e := range merged {
-		fmt.Printf("Camera: %s | Event: %s | Confidence: %.2f\n",
-			e.Camera, e.Event, e.Confidence)
+		record.WriteEvent(&e)
+
 	}
 }
 
-func streamEvent(camera config.Camera) (<-chan Event, error) {
+func streamEvent(camera config.Camera) (<-chan config.Event, error) {
 	cmd := exec.Command("python3", "Pycode/main.py", fmt.Sprintf("%v", camera.Source), camera.Name)
 
 	stdout, err := cmd.StdoutPipe()
@@ -45,7 +40,7 @@ func streamEvent(camera config.Camera) (<-chan Event, error) {
 		return nil, err
 	}
 
-	ch := make(chan Event)
+	ch := make(chan config.Event)
 
 	if err := cmd.Start(); err != nil {
 		return nil, err
@@ -57,7 +52,7 @@ func streamEvent(camera config.Camera) (<-chan Event, error) {
 
 		scanner := bufio.NewScanner(stdout)
 		for scanner.Scan() {
-			var e Event
+			var e config.Event
 			err := json.Unmarshal(scanner.Bytes(), &e)
 			if err == nil {
 				ch <- e
@@ -68,13 +63,13 @@ func streamEvent(camera config.Camera) (<-chan Event, error) {
 	return ch, nil
 }
 
-func merge(channels ...<-chan Event) <-chan Event {
-	out := make(chan Event)
+func merge(channels ...<-chan config.Event) <-chan config.Event {
+	out := make(chan config.Event)
 	var wg sync.WaitGroup
 
 	for _, ch := range channels {
 		wg.Add(1)
-		go func(c <-chan Event) {
+		go func(c <-chan config.Event) {
 			defer wg.Done()
 			for e := range c {
 				out <- e

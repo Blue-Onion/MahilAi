@@ -14,6 +14,12 @@ type Camera struct {
 type Config struct {
 	Cameras []Camera
 }
+type Event struct {
+	Camera     string
+	Time       float64
+	Event      string
+	Confidence float64
+}
 
 func CreateDefaultConfig() error {
 	defaultConfig := `cameras:
