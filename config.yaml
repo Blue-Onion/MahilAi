@@ -1,3 +1,4 @@
+# Sample Config File change it
 cameras:
   - name: cam1
     source: 0
