@@ -130,4 +130,4 @@ The pipeline architecture relies on **modular detection integration**. You can s
 
 ## License
 
-[MIT License](LICENSE) (Placeholder) - See the `LICENSE` file for details.
+Licensed under the MIT License.
