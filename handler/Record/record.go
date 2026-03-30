@@ -105,7 +105,8 @@ func readDateAllEvent(date string) ([]Records, error) {
 		if f.IsDir(){
 			continue
 		}
-		filePath:=fmt.Sprintf("%s/%s.log",path,f.Name())
+		filePath:=fmt.Sprintf("%s/%s",path,f.Name())
+		fmt.Println(filePath)
 		event,err:=ReadEvents(filePath)
 		if err!=nil{
 			continue
